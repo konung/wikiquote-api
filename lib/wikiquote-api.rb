@@ -6,9 +6,9 @@ class Wikiquote
   @@lang = "en"
   @@url = "https://#{@@lang}.wikiquote.org/w/api.php"
 
-  # getTitle
-  # Get page id of a page which correspond to argv title
-  # ret : int
+  # getTitle (String CelebrityName)
+  # Get page id of a page which correspond to argv title.
+  # Return an int or nil if an error occurs
 
   def self.getTitle(title)
     uri = URI(@@url)
@@ -29,9 +29,9 @@ class Wikiquote
     end
   end
 
-  # getSectionForPage
+  # getSectionForPage (Fixnum pageId)
   # Get the sections for the given page id
-  # ret : {sectionId: sectionName, ...}
+  # Return an hash like : {sectionId: sectionName, ...} or an empty hash if an error occurs
 
   def self.getSectionsForPage(pageId)
     uri = URI(@@url)
@@ -41,9 +41,13 @@ class Wikiquote
     res = Net::HTTP.get_response(uri)
     if res.is_a?(Net::HTTPSuccess)
       hash = {}
-      arr = JSON.parse(res.body)["parse"]["sections"]
-      arr.each do |elem|
-        hash[elem["number"]] = elem["anchor"]
+      begin
+        arr = JSON.parse(res.body)["parse"]["sections"]
+        arr.each do |elem|
+          hash[elem["number"]] = elem["anchor"]
+        end
+      rescue
+        puts "Given pageid not found"
       end
       hash
     else
@@ -51,9 +55,9 @@ class Wikiquote
     end
   end
 
-  # getQuotesForSection
+  # getQuotesForSection (Fixnum pageId, Fixnum sectionId)
   # Get all quotes from given section id
-  # ret array
+  # Return an array of string. Each string is a quote
 
   def self.getQuotesForSection(pageId, sectionId)
     uri = URI(@@url)
@@ -73,6 +77,10 @@ class Wikiquote
     end
   end
 
+  # getRandomQuote (String CelebrityName)
+  # Get a random quote from give celebrity name
+  # Return a string which is the randomly picked quote
+
   def self.getRandomQuote(title)
 
     begin
@@ -90,12 +98,17 @@ class Wikiquote
 
   end
 
+  # resetUrl
+  # Used after a language change to reset url
+
   def self.resetUrl()
     @@url = "https://#{@@lang}.wikiquote.org/w/api.php"
   end
 
-  def self.setLang(lang)
+  # setLang
+  # Change Wikiquote language
 
+  def self.setLang(lang)
     success = true
 
     if lang.length == 2
