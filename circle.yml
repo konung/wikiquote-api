@@ -1,0 +1,47 @@
+## Customize the test machine
+machine:
+
+  timezone:
+    Europe/Paris # Set the timezone
+
+  # Version of ruby to use
+  ruby:
+    version:
+      2.3.3p222
+
+  # Override /etc/hosts
+  hosts:
+    circlehost: 127.0.0.1
+
+  # Add some environment variables
+  environment:
+    CIRCLE_ENV: test
+
+checkout:
+  post:
+    - git submodule sync
+    - git submodule update --init # use submodules
+
+## Customize dependencies
+dependencies:
+  pre:
+    - require 'minitest/autorun'
+    - require 'wikiquote-api'
+
+  override:
+    - bundle install: # note ':' here
+        timeout: 180
+
+## Customize test commands
+test:
+  post:
+    - bundle exec rake test # add an extra test type
+        environment:
+          RAILS_ENV: test
+
+
+## Custom notifications
+notify:
+  webhooks:
+    # A list of hashes representing hooks. Only the url field is supported.
+    - url: https://someurl.com/hooks/circle
