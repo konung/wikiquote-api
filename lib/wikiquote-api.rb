@@ -12,8 +12,8 @@ class Wikiquote
 
   def self.getTitle(title)
     uri = URI(@@url)
-    newTitle = title.split(' ').collect{ |elem| elem.capitalize }.join(' ')
-    params = { format: "json", action: "query", titles: newTitle }
+    new_title = title.split(' ').collect{ |elem| elem.capitalize }.join(' ')
+    params = { format: "json", action: "query", titles: new_title }
     uri.query = URI.encode_www_form(params)
 
     res = Net::HTTP.get_response(uri)
@@ -29,13 +29,13 @@ class Wikiquote
     end
   end
 
-  # getSectionForPage (Fixnum pageId)
+  # getSectionForPage (Fixnum page_id)
   # Get the sections for the given page id
-  # Return an hash like : {sectionId: sectionName, ...} or an empty hash if an error occurs
+  # Return an hash like : {section_id: sectionName, ...} or an empty hash if an error occurs
 
-  def self.getSectionsForPage(pageId)
+  def self.getSectionsForPage(page_id)
     uri = URI(@@url)
-    params = { format: "json", action: "parse", pageid: pageId, prop: "sections" }
+    params = { format: "json", action: "parse", pageid: page_id, prop: "sections" }
     uri.query = URI.encode_www_form(params)
 
     res = Net::HTTP.get_response(uri)
@@ -55,23 +55,28 @@ class Wikiquote
     end
   end
 
-  # getQuotesForSection (Fixnum pageId, Fixnum sectionId)
+  # getQuotesForSection (Fixnum page_id, Fixnum section_id)
   # Get all quotes from given section id
   # Return an array of string. Each string is a quote
 
-  def self.getQuotesForSection(pageId, sectionId)
+  def self.getQuotesForSection(page_id, section_id)
     uri = URI(@@url)
-    params = { format: "json", action: "parse", pageid: pageId, noimages: "", section: sectionId }
+    params = { format: "json", action: "parse", pageid: page_id, noimages: "", section: section_id }
     uri.query = URI.encode_www_form(params)
 
     res = Net::HTTP.get_response(uri)
+    ret = []
     if res.is_a?(Net::HTTPSuccess)
-      page = Nokogiri::HTML(res.body)
-      arr1 = page.css("ul li")
-      arr2 = page.css("ul li ul li")
-      short = arr1 + arr2 - (arr1 & arr2)
-      long = arr1 + arr2
-      short.collect{ |l| l.text }
+      arr = JSON.parse(res.body)
+      unless arr["error"]
+        page = Nokogiri::HTML(arr["parse"]["text"]["*"])
+        arr1 = page.css("ul li")
+        arr2 = page.css("ul li ul li")
+        short = arr1 + arr2 - (arr1 & arr2)
+        long = arr1 + arr2
+        ret = short.collect{ |l| l.text }
+      end
+      ret
     else
       puts "Oops, something went wrong"
     end
@@ -84,10 +89,10 @@ class Wikiquote
   def self.getRandomQuote(title)
 
     begin
-      pageId = self.getTitle(title)
-      sections = self.getSectionsForPage(pageId)
-      sectionId = sections.key("Quotes")
-      quotes = self.getQuotesForSection(pageId, sectionId)
+      page_id = self.getTitle(title)
+      sections = self.getSectionsForPage(page_id)
+      section_id = sections.key("Quotes")
+      quotes = self.getQuotesForSection(page_id, section_id)
       if quotes.count == 0
         puts "No quote found"
       end
