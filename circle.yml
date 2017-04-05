@@ -30,7 +30,7 @@ checkout:
 ########################
 dependencies:
   pre:
-    - gem install minitest/autorun
+    - gem install minitest
     - gem install wikiquote-api
 
   override:
