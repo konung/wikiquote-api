@@ -5,8 +5,11 @@ This gem was created in order to simplify use of wikiquote.org in your ruby or r
 
 ## Installation
 You can install it simply by running in the terminal the following command :
+
 `gem install wikiquote-api`
-Or you can also add it to you gemfile :
+
+You can also add it to your gemfile :
+
 `gem 'wikiquote-api'`
 
 ## Usage
@@ -22,7 +25,7 @@ By default, locale is "en" for english.
 * 0.1.0 :  First version ever
 
 ## Important note
-Be carefull when updating the gem. Check the methods parameters and returns, they may change between release (0.x.x to 1.x.x etc...)
+Be carefull when updating the gem. Check the method parameters and returns, they may change between release (0.x.x to 1.x.x etc...)
 
 ## Support
 Don't hesitate to open issues for any question.
