@@ -32,6 +32,7 @@ dependencies:
   pre:
     - gem install minitest
     - gem install wikiquote-api
+    - touch Gemfile
 
   override:
     - bundle install:
@@ -42,9 +43,9 @@ dependencies:
 ########################
 test:
   override:
-    - phpunit test/unit-tests # use PHPunit for testing
+    - bundle exec rake test # use PHPunit for testing
   post:
-    - bundle exec rake jasmine:ci: # add an extra test type
+    - bundle exec rake test # add an extra test type
       environment:
         RAILS_ENV=test
         RACK_ENV=test
