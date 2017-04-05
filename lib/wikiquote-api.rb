@@ -8,7 +8,7 @@ class Wikiquote
 
   # getTitle (String CelebrityName)
   # Get page id of a page which correspond to argv title.
-  # Return an int or nil if an error occurs
+  # Return a positive int or -1 if an error occurs
 
   def self.getTitle(title)
     uri = URI(@@url)
@@ -19,14 +19,11 @@ class Wikiquote
     res = Net::HTTP.get_response(uri)
     if res.is_a?(Net::HTTPSuccess)
       res = JSON.parse(res.body)["query"]["pages"].first[0].to_i
-      if res == -1
-        puts "Cannot find result for the given title"
-      else
-        res
-      end
     else
-      puts "Oops, something went wrong"
+      # puts "Request didn't succeed"
+      res = -1
     end
+    res
   end
 
   # getSectionForPage (Fixnum page_id)
@@ -34,25 +31,24 @@ class Wikiquote
   # Return an hash like : {section_id: sectionName, ...} or an empty hash if an error occurs
 
   def self.getSectionsForPage(page_id)
+
     uri = URI(@@url)
     params = { format: "json", action: "parse", pageid: page_id, prop: "sections" }
     uri.query = URI.encode_www_form(params)
 
     res = Net::HTTP.get_response(uri)
+    hash = {}
     if res.is_a?(Net::HTTPSuccess)
-      hash = {}
-      begin
+      unless page_id == -1
         arr = JSON.parse(res.body)["parse"]["sections"]
         arr.each do |elem|
           hash[elem["number"]] = elem["anchor"]
         end
-      rescue
-        puts "Given pageid not found"
       end
-      hash
     else
-      puts "Oops, something went wrong"
+      # puts "Request didn't succeed"
     end
+    hash
   end
 
   # getQuotesForSection (Fixnum page_id, Fixnum section_id)
@@ -76,10 +72,10 @@ class Wikiquote
         long = arr1 + arr2
         ret = short.collect{ |l| l.text }
       end
-      ret
     else
-      puts "Oops, something went wrong"
+      # puts "Request didn't succeed"
     end
+    ret
   end
 
   # getRandomQuote (String CelebrityName)
@@ -88,18 +84,16 @@ class Wikiquote
 
   def self.getRandomQuote(title)
 
+    res = ""
     begin
       page_id = self.getTitle(title)
-      sections = self.getSectionsForPage(page_id)
-      section_id = sections.key("Quotes")
-      quotes = self.getQuotesForSection(page_id, section_id)
-      if quotes.count == 0
-        puts "No quote found"
+      unless page_id == -1
+        quotes = self.getQuotesForSection(page_id, 1)
+        res = quotes[rand(quotes.length)]
       end
-      res = quotes[rand(quotes.length)]
-      res
     rescue
     end
+    res
 
   end
 
@@ -112,6 +106,7 @@ class Wikiquote
 
   # setLang
   # Change Wikiquote language
+  # Return true if succeed or false if error
 
   def self.setLang(lang)
     success = true
@@ -135,6 +130,7 @@ class Wikiquote
       puts "The lang in parameter must be a two letters string"
     end
     self.resetUrl()
+    success
   end
 
 end

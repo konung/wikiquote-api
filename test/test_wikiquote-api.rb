@@ -4,13 +4,12 @@ require 'wikiquote-api'
 class WikiquoteTest < Minitest::Test
 
   def test_getTitle
-    assert_nil Wikiquote.getTitle("kugqfgqiufd")
+    assert_equal -1, Wikiquote.getTitle("kugqfgqiufd")
     assert_kind_of Fixnum, Wikiquote.getTitle("Bill Gates")
     assert_equal 105, Wikiquote.getTitle("Bill Gates")
   end
 
   def test_getSections
-    assert_nil Wikiquote.getTitle("kugqfgqiufd")
     assert_equal Hash.new(), Wikiquote.getSectionsForPage(-1)
     assert_kind_of Hash, Wikiquote.getSectionsForPage(105)
   end
