@@ -20,9 +20,11 @@ Note that you can change the language of wikiquote by doing `Wikiquote.setLang("
 By default, locale is "en" for english.
 
 ## Version history
-* 0.1.1 : Fixed a bug with unicode characters
+* 0.2.0 : Uniformized methods return values
 
-* 0.1.0 :  First version ever
+* 0.1.2 : Fixed a bug with unicode characters
+
+* 0.1.1 :  First version ever
 
 ## Important note
 Be carefull when updating the gem. Check the method parameters and returns, they may change between release (0.x.x to 1.x.x etc...)
