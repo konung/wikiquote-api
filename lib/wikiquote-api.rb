@@ -44,6 +44,7 @@ class Wikiquote
         arr.each do |elem|
           hash[elem["number"]] = elem["anchor"]
         end
+        hash["title"]= JSON.parse(res.body)["parse"]["title"]
       end
     else
       # puts "Request didn't succeed"
